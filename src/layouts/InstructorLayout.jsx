@@ -1,12 +1,12 @@
 import { Outlet } from 'react-router-dom'
 
-const StudentLayout = () => (
+const InstructorLayout = () => (
   <div className="min-h-screen flex">
-    {/* Student sidebar goes here in F4 */}
+    {/* Instructor sidebar goes here in F5 */}
     <main className="flex-1 p-6">
       <Outlet />
     </main>
   </div>
 )
 
-export default StudentLayout
+export default InstructorLayout
