@@ -39,6 +39,12 @@ const StarRating = ({ rating }) => (
     </div>
 )
 
+const reviews = Array.isArray(reviewsData?.data)
+  ? reviewsData.data
+  : Array.isArray(reviewsData?.data?.reviews)
+  ? reviewsData.data.reviews
+  : []
+
 const CourseDetailPage = () => {
     const { slug } = useParams()
     const { isAuthenticated } = useAuth()
