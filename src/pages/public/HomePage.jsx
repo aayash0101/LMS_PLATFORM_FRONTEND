@@ -3,6 +3,7 @@ import { ArrowRight, BookOpen, Users, Award } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import CourseGrid from '@/features/courses/components/CourseGrid'
 import { useCourses } from '@/features/courses/hooks/useCourses'
+import { LinkButton } from '@/components/ui/link-button'
 
 const STATS = [
   { icon: BookOpen, label: 'Courses', value: '500+' },
@@ -28,14 +29,14 @@ const HomePage = () => {
             on any device, anytime.
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
-            <Button size="lg" asChild>
+            <LinkButton size="lg" >
               <Link to="/courses">
                 Browse Courses <ArrowRight className="ml-2 w-4 h-4" />
               </Link>
-            </Button>
-            <Button size="lg" variant="outline" asChild>
+            </LinkButton>
+            <LinkButton size="lg" variant="outline">
               <Link to="/register">Start Teaching</Link>
-            </Button>
+            </LinkButton>
           </div>
         </div>
       </section>
@@ -60,9 +61,9 @@ const HomePage = () => {
             <h2 className="text-2xl font-bold">Most Popular Courses</h2>
             <p className="text-muted-foreground mt-1">Join thousands of learners today</p>
           </div>
-          <Button variant="outline" asChild>
+          <LinkButton variant="outline" >
             <Link to="/courses">View all</Link>
-          </Button>
+          </LinkButton>
         </div>
         <CourseGrid courses={courses} isLoading={isLoading} count={8} />
       </section>

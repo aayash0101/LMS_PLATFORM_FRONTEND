@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { LinkButton } from '@/components/ui/link-button'
 
 const CourseSkeleton = () => (
     <Card>
@@ -54,11 +55,9 @@ const EnrollmentCard = ({ enrollment }) => {
                     <Progress value={enrollment.completionPercentage ?? 0} className="h-2" />
                 </div>
 
-                <Button size="sm" className="w-full" asChild>
-                    <Link to={`/learn/${course?._id}`}>
-                        {enrollment.isCompleted ? 'Review Course' : 'Continue Learning'}
-                    </Link>
-                </Button>
+                <LinkButton size="sm" className="w-full" to={`/learn/${course?._id}`}>
+                    {enrollment.isCompleted ? 'Review Course' : 'Continue Learning'}
+                </LinkButton>
             </CardContent>
         </Card>
     )
@@ -105,9 +104,7 @@ const MyCoursesPage = () => {
                                     <BookOpen className="w-10 h-10 mx-auto opacity-30" />
                                     <p>No courses here yet.</p>
                                     {tab === 'all' && (
-                                        <Button asChild>
-                                            <Link to="/courses">Browse Courses</Link>
-                                        </Button>
+                                        <LinkButton to="/courses">Browse Courses</LinkButton>
                                     )}
                                 </div>
                             ) : (

@@ -1,8 +1,8 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { BookOpen, LogOut, LayoutDashboard, Menu } from 'lucide-react'
+import { BookOpen, LogOut, LayoutDashboard } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useLogout } from '@/features/auth/hooks/useLogout'
-import { Button } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
@@ -12,7 +12,7 @@ import {
 const Navbar = () => {
   const { user, isAuthenticated, isInstructor } = useAuth()
   const { mutate: logout } = useLogout()
-
+  const navigate = useNavigate()
   const dashboardPath = isInstructor ? '/instructor/dashboard' : '/dashboard'
   const initials = user?.name?.split(' ').map((n) => n[0]).join('').toUpperCase() ?? '?'
 
@@ -20,14 +20,11 @@ const Navbar = () => {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-
-          {/* Logo */}
           <Link to="/" className="flex items-center gap-2 font-bold text-xl text-primary">
             <BookOpen className="w-6 h-6" />
             LearnHub
           </Link>
 
-          {/* Nav links */}
           <nav className="hidden md:flex items-center gap-6">
             <Link
               to="/courses"
@@ -37,26 +34,25 @@ const Navbar = () => {
             </Link>
           </nav>
 
-          {/* Auth actions */}
           <div className="flex items-center gap-3">
             {!isAuthenticated ? (
               <>
-                <Button variant="ghost" size="sm" asChild>
-                  <Link to="/login">Sign in</Link>
-                </Button>
-                <Button size="sm" asChild>
-                  <Link to="/register">Get started</Link>
-                </Button>
+                <Link to="/login" className={buttonVariants({ variant: 'ghost', size: 'sm' })}>
+                  Sign in
+                </Link>
+                <Link to="/register" className={buttonVariants({ size: 'sm' })}>
+                  Get started
+                </Link>
               </>
             ) : (
               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="flex items-center gap-2 rounded-full focus:outline-none focus:ring-2 focus:ring-ring">
-                    <Avatar className="h-8 w-8">
+                <DropdownMenuTrigger className="outline-none">
+                  <div className="flex items-center cursor-pointer rounded-full focus-visible:ring-2 focus-visible:ring-ring">
+                    <Avatar className="h-8 w-8 hover:opacity-80 transition-opacity">
                       <AvatarImage src={user?.avatar?.url} />
                       <AvatarFallback className="text-xs">{initials}</AvatarFallback>
                     </Avatar>
-                  </button>
+                  </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   <div className="px-2 py-1.5">
@@ -64,12 +60,15 @@ const Navbar = () => {
                     <p className="text-xs text-muted-foreground capitalize">{user?.role}</p>
                   </div>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link to={dashboardPath} className="flex items-center gap-2 cursor-pointer">
-                      <LayoutDashboard className="w-4 h-4" />
-                      Dashboard
-                    </Link>
+
+                  <DropdownMenuItem
+                    className="flex items-center gap-2 cursor-pointer"
+                    onClick={() => navigate(dashboardPath)}
+                  >
+                    <LayoutDashboard className="w-4 h-4" />
+                    Dashboard
                   </DropdownMenuItem>
+
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     className="text-destructive flex items-center gap-2 cursor-pointer"

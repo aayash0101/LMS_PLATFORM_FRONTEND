@@ -10,8 +10,8 @@ const CourseCatalogPage = () => {
   const [filters, setFilters] = useState(DEFAULT_FILTERS)
   const { data, isLoading } = useCourses(filters)
 
-  const courses    = data?.data ?? []
-  const pagination = data?.pagination ?? null
+const courses    = data?.data?.courses ?? []
+const pagination = data?.pagination ?? null
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">

@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
+import { LinkButton } from '@/components/ui/link-button'
 
 const StatCard = ({ icon: Icon, label, value, color = 'text-primary' }) => (
   <Card>
@@ -49,12 +50,12 @@ const InstructorDashboardPage = () => {
           <h1 className="text-2xl font-bold">Welcome back, {user?.name?.split(' ')[0]}</h1>
           <p className="text-muted-foreground mt-1">Here's how your courses are performing</p>
         </div>
-        <Button asChild>
+        <LinkButton >
           <Link to="/instructor/courses/create">
             <PlusCircle className="w-4 h-4 mr-2" />
             New Course
           </Link>
-        </Button>
+        </LinkButton>
       </div>
 
       {/* Stats */}
@@ -69,9 +70,9 @@ const InstructorDashboardPage = () => {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">Your Courses</h2>
-          <Button variant="ghost" size="sm" asChild>
+          <LinkButton variant="ghost" size="sm" >
             <Link to="/instructor/courses">View all <ArrowRight className="w-3 h-3 ml-1" /></Link>
-          </Button>
+          </LinkButton>
         </div>
 
         {courses.length === 0 ? (
@@ -79,9 +80,9 @@ const InstructorDashboardPage = () => {
             <CardContent className="py-12 text-center space-y-3">
               <BookOpen className="w-10 h-10 mx-auto text-muted-foreground opacity-30" />
               <p className="text-muted-foreground">You haven't created any courses yet.</p>
-              <Button asChild>
+              <LinkButton >
                 <Link to="/instructor/courses/create">Create your first course</Link>
-              </Button>
+              </LinkButton>
             </CardContent>
           </Card>
         ) : (
@@ -106,9 +107,9 @@ const InstructorDashboardPage = () => {
                     <Badge variant={course.isPublished ? 'default' : 'secondary'}>
                       {course.isPublished ? 'Published' : 'Draft'}
                     </Badge>
-                    <Button size="sm" variant="outline" asChild>
+                    <LinkButton size="sm" variant="outline" >
                       <Link to={`/instructor/courses/${course._id}/edit`}>Edit</Link>
-                    </Button>
+                    </LinkButton>
                   </div>
                 </CardContent>
               </Card>

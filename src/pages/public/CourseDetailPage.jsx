@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { LinkButton } from '@/components/ui/link-button'
 import {
     Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from '@/components/ui/accordion'
@@ -118,13 +119,13 @@ const CourseDetailPage = () => {
                                 )}
                             </div>
                             {!isAuthenticated ? (
-                                <Button className="w-full" size="lg" asChild>
+                                <LinkButton className="w-full" size="lg" >
                                     <Link to="/register">Enroll Now — It's Free</Link>
-                                </Button>
+                                </LinkButton>
                             ) : enrollment ? (
-                                <Button className="w-full" size="lg" asChild>
+                                <LinkButton className="w-full" size="lg" >
                                     <Link to={`/learn/${course._id}`}>Go to Course</Link>
-                                </Button>
+                                </LinkButton>
                             ) : (
                                 <Button
                                     className="w-full"

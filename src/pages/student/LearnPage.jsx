@@ -1,4 +1,3 @@
-// src/pages/student/LearnPage.jsx
 import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import {
@@ -15,6 +14,7 @@ import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
+import { LinkButton } from '@/components/ui/link-button'
 
 const VideoPlayer = ({ url, onEnded }) => {
   if (!url) return (
@@ -128,9 +128,9 @@ const LearnPage = () => {
         >
           {enrolling ? 'Enrolling...' : 'Enroll Now'}
         </Button>
-        <Button variant="ghost" asChild className="w-full">
+        <LinkButton variant="ghost"  className="w-full">
           <Link to="/courses">Back to courses</Link>
-        </Button>
+        </LinkButton>
       </div>
     </div>
   )
@@ -139,11 +139,11 @@ const LearnPage = () => {
     <div className="min-h-screen flex flex-col bg-background">
 
       <header className="h-14 border-b flex items-center gap-4 px-4 sticky top-0 z-50 bg-background">
-        <Button variant="ghost" size="icon" asChild>
+        <LinkButton variant="ghost" size="icon" >
           <Link to="/my-courses">
             <ArrowLeft className="w-4 h-4" />
           </Link>
-        </Button>
+        </LinkButton>
 
         <div className="flex-1 min-w-0">
           <p className="font-medium text-sm line-clamp-1">{course?.title}</p>

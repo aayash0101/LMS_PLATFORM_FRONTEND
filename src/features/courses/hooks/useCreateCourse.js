@@ -10,7 +10,7 @@ export const useCreateCourse = () => {
     mutationFn: createCourseApi,
     onSuccess: ({ data }) => {
       queryClient.invalidateQueries({ queryKey: ['instructor-courses'] })
-      navigate(`/instructor/courses/${data.data._id}/edit`)
+      navigate(`/instructor/courses/${data.data.course._id}/edit`)
     },
   })
 }

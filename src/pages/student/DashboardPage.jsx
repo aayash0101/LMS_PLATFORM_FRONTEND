@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { LinkButton } from '@/components/ui/link-button'
 
 const StatCard = ({ icon: Icon, label, value, color = 'text-primary' }) => (
   <Card>
@@ -67,9 +68,9 @@ const StudentDashboardPage = () => {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">Continue Learning</h2>
-          <Button variant="ghost" size="sm" asChild>
+          <LinkButton variant="ghost" size="sm" >
             <Link to="/my-courses">View all</Link>
-          </Button>
+          </LinkButton>
         </div>
 
         {recentEnrollments.length === 0 ? (
@@ -77,9 +78,9 @@ const StudentDashboardPage = () => {
             <CardContent className="py-12 text-center text-muted-foreground space-y-3">
               <BookOpen className="w-10 h-10 mx-auto opacity-30" />
               <p>You haven't enrolled in any courses yet.</p>
-              <Button asChild>
+              <LinkButton >
                 <Link to="/courses">Browse Courses</Link>
-              </Button>
+              </LinkButton>
             </CardContent>
           </Card>
         ) : (
@@ -124,11 +125,11 @@ const StudentDashboardPage = () => {
                       </div>
 
                       {/* Action */}
-                      <Button size="sm" variant="outline" asChild className="shrink-0">
+                      <LinkButton size="sm" variant="outline" className="shrink-0">
                         <Link to={`/learn/${course?._id}`}>
                           {enrollment.isCompleted ? 'Review' : 'Continue'}
                         </Link>
-                      </Button>
+                      </LinkButton>
                     </div>
                   </CardContent>
                 </Card>
