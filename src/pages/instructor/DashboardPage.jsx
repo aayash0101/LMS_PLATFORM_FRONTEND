@@ -1,9 +1,8 @@
-import { Link } from 'react-router-dom'
+// src/pages/instructor/DashboardPage.jsx
 import { BookOpen, Users, Star, DollarSign, PlusCircle, ArrowRight } from 'lucide-react'
 import { useInstructorCourses } from '@/features/courses/hooks/useInstructorCourses'
 import { useAuth } from '@/hooks/useAuth'
 import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { LinkButton } from '@/components/ui/link-button'
@@ -26,7 +25,11 @@ const InstructorDashboardPage = () => {
   const { user } = useAuth()
   const { data, isLoading } = useInstructorCourses()
 
-  const courses = Array.isArray(data?.data) ? data.data : []
+  const courses = Array.isArray(data?.data?.courses)
+    ? data.data.courses
+    : Array.isArray(data?.data)
+    ? data.data
+    : []
 
   const totalStudents = courses.reduce((acc, c) => acc + (c.totalStudents ?? 0), 0)
   const totalRevenue  = courses.reduce((acc, c) => acc + (c.price ?? 0) * (c.totalStudents ?? 0), 0)
@@ -38,40 +41,44 @@ const InstructorDashboardPage = () => {
     <div className="space-y-8">
       <Skeleton className="h-8 w-48" />
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {[1,2,3,4].map((i) => <Skeleton key={i} className="h-24 rounded-xl" />)}
+        {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-24 rounded-xl" />)}
       </div>
     </div>
   )
 
   return (
     <div className="space-y-8">
+
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Welcome back, {user?.name?.split(' ')[0]}</h1>
-          <p className="text-muted-foreground mt-1">Here's how your courses are performing</p>
+          <h1 className="text-2xl font-bold">
+            Welcome back, {user?.name?.split(' ')[0]}
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Here's how your courses are performing
+          </p>
         </div>
-        <LinkButton >
-          <Link to="/instructor/courses/create">
-            <PlusCircle className="w-4 h-4 mr-2" />
-            New Course
-          </Link>
+        <LinkButton to="/instructor/courses/create">
+          <PlusCircle className="w-4 h-4 mr-2" />
+          New Course
         </LinkButton>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard icon={BookOpen}    label="Total Courses"  value={courses.length} />
-        <StatCard icon={Users}       label="Total Students" value={totalStudents} color="text-blue-500" />
-        <StatCard icon={Star}        label="Avg Rating"     value={avgRating.toFixed(1)} color="text-amber-500" />
-        <StatCard icon={DollarSign}  label="Total Revenue"  value={`$${totalRevenue.toFixed(2)}`} color="text-green-600" />
+        <StatCard icon={BookOpen}   label="Total Courses"  value={courses.length} />
+        <StatCard icon={Users}      label="Total Students" value={totalStudents}   color="text-blue-500" />
+        <StatCard icon={Star}       label="Avg Rating"     value={avgRating.toFixed(1)} color="text-amber-500" />
+        <StatCard icon={DollarSign} label="Total Revenue"  value={`$${totalRevenue.toFixed(2)}`} color="text-green-600" />
       </div>
 
       {/* Recent courses */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">Your Courses</h2>
-          <LinkButton variant="ghost" size="sm" >
-            <Link to="/instructor/courses">View all <ArrowRight className="w-3 h-3 ml-1" /></Link>
+          <LinkButton variant="ghost" size="sm" to="/instructor/courses">
+            View all <ArrowRight className="w-3 h-3 ml-1" />
           </LinkButton>
         </div>
 
@@ -79,9 +86,11 @@ const InstructorDashboardPage = () => {
           <Card>
             <CardContent className="py-12 text-center space-y-3">
               <BookOpen className="w-10 h-10 mx-auto text-muted-foreground opacity-30" />
-              <p className="text-muted-foreground">You haven't created any courses yet.</p>
-              <LinkButton >
-                <Link to="/instructor/courses/create">Create your first course</Link>
+              <p className="text-muted-foreground">
+                You haven't created any courses yet.
+              </p>
+              <LinkButton to="/instructor/courses/create">
+                Create your first course
               </LinkButton>
             </CardContent>
           </Card>
@@ -90,12 +99,23 @@ const InstructorDashboardPage = () => {
             {courses.slice(0, 5).map((course) => (
               <Card key={course._id} className="hover:shadow-md transition-shadow">
                 <CardContent className="p-4 flex items-center gap-4">
+
+                  {/* Thumbnail */}
                   <div className="w-16 h-12 rounded bg-muted overflow-hidden shrink-0">
-                    {course.thumbnail?.url
-                      ? <img src={course.thumbnail.url} alt={course.title} className="w-full h-full object-cover" />
-                      : <div className="w-full h-full flex items-center justify-center"><BookOpen className="w-4 h-4 text-muted-foreground" /></div>
-                    }
+                    {course.thumbnail?.url ? (
+                      <img
+                        src={course.thumbnail.url}
+                        alt={course.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <BookOpen className="w-4 h-4 text-muted-foreground" />
+                      </div>
+                    )}
                   </div>
+
+                  {/* Info */}
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-sm line-clamp-1">{course.title}</p>
                     <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
@@ -103,14 +123,21 @@ const InstructorDashboardPage = () => {
                       <span>⭐ {course.averageRating?.toFixed(1) ?? '0.0'}</span>
                     </div>
                   </div>
+
+                  {/* Actions */}
                   <div className="flex items-center gap-2 shrink-0">
                     <Badge variant={course.isPublished ? 'default' : 'secondary'}>
                       {course.isPublished ? 'Published' : 'Draft'}
                     </Badge>
-                    <LinkButton size="sm" variant="outline" >
-                      <Link to={`/instructor/courses/${course._id}/edit`}>Edit</Link>
+                    <LinkButton
+                      size="sm"
+                      variant="outline"
+                      to={`/instructor/courses/${course._id}/edit`}
+                    >
+                      Edit
                     </LinkButton>
                   </div>
+
                 </CardContent>
               </Card>
             ))}
