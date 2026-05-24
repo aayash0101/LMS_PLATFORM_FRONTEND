@@ -1,4 +1,3 @@
-// src/features/courses/api/instructor.courses.api.js
 import api from '@/api/axios'
 
 export const getMyCoursesApi = () =>
@@ -21,7 +20,6 @@ export const uploadThumbnailApi = (id, formData) =>
     headers: { 'Content-Type': 'multipart/form-data' },
   })
 
-// ── Sections ──────────────────────────────────────────────────────────────
 export const getSectionsApi = (courseId) =>
   api.get(`/courses/${courseId}/sections`)
 
