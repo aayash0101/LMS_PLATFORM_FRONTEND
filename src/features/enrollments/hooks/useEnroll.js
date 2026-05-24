@@ -1,4 +1,3 @@
-// src/features/enrollments/hooks/useEnroll.js
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { enrollInCourseApi } from '../api/enrollments.api'
 
