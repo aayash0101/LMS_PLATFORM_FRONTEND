@@ -1,7 +1,7 @@
-// src/pages/public/CourseDetailPage.jsx
+import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import {
-    Star, Users, BookOpen, CheckCircle2,
+    Star, Users, BookOpen, CheckCircle2, Play, X,
 } from 'lucide-react'
 import { useCourse } from '@/features/courses/hooks/useCourse'
 import { useCourseReviews } from '@/features/reviews/hooks/useCourseReviews'
@@ -16,6 +16,9 @@ import { LinkButton } from '@/components/ui/link-button'
 import {
     Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from '@/components/ui/accordion'
+import {
+    Dialog, DialogContent, DialogHeader, DialogTitle,
+} from '@/components/ui/dialog'
 
 // ── Skeleton ───────────────────────────────────────────────────────────────
 const DetailSkeleton = () => (
@@ -28,41 +31,61 @@ const DetailSkeleton = () => (
     </div>
 )
 
-// ── Star display ───────────────────────────────────────────────────────────
 const StarRating = ({ rating }) => (
     <div className="flex items-center gap-0.5">
         {[1, 2, 3, 4, 5].map((s) => (
             <Star
                 key={s}
                 className={`w-4 h-4 ${s <= Math.round(rating)
-                        ? 'fill-amber-400 text-amber-400'
-                        : 'text-muted-foreground'
+                    ? 'fill-amber-400 text-amber-400'
+                    : 'text-muted-foreground'
                     }`}
             />
         ))}
     </div>
 )
 
-// ── Main ───────────────────────────────────────────────────────────────────
+const PreviewModal = ({ lesson, open, onClose }) => (
+    <Dialog open={open} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-3xl p-0 overflow-hidden">
+            <DialogHeader className="px-6 pt-6 pb-2">
+                <DialogTitle className="text-base">{lesson?.title}</DialogTitle>
+            </DialogHeader>
+            <div className="aspect-video bg-black">
+                {lesson?.video?.url ? (
+                    <video
+                        key={lesson._id}
+                        className="w-full h-full"
+                        controls
+                        autoPlay
+                        src={lesson.video.url}
+                    />
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center text-slate-400 text-sm">
+                        No video available for this lesson
+                    </div>
+                )}
+            </div>
+        </DialogContent>
+    </Dialog>
+)
+
 const CourseDetailPage = () => {
     const { slug } = useParams()
     const { isAuthenticated } = useAuth()
+    const [previewLesson, setPreviewLesson] = useState(null)
 
     const { data: courseData, isLoading } = useCourse(slug)
     const course = courseData?.data?.course
 
-
-    // Only fetch enrollment + reviews once we have the course id
     const { data: enrollmentData } = useEnrollment(
         isAuthenticated && course?._id ? course._id : null
     )
-    const enrollment = enrollmentData?.data
+    const enrollment = enrollmentData?.data?.enrollment
 
     const { mutate: enroll, isPending: enrolling } = useEnroll(course?._id)
 
     const { data: reviewsData } = useCourseReviews(course?._id)
-
-    // Defensive extraction — handles both array and nested shape
     const reviews = Array.isArray(reviewsData?.data)
         ? reviewsData.data
         : Array.isArray(reviewsData?.data?.reviews)
@@ -81,12 +104,16 @@ const CourseDetailPage = () => {
     return (
         <div className="min-h-screen">
 
-            {/* ── Hero banner ────────────────────────────────────────────────── */}
+            <PreviewModal
+                lesson={previewLesson}
+                open={!!previewLesson}
+                onClose={() => setPreviewLesson(null)}
+            />
+
             <div className="bg-slate-900 text-white">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                     <div className="grid lg:grid-cols-3 gap-8 items-start">
 
-                        {/* Left: info */}
                         <div className="lg:col-span-2 space-y-4">
                             <div className="flex gap-2 flex-wrap">
                                 <Badge variant="secondary">{course.category}</Badge>
@@ -122,7 +149,6 @@ const CourseDetailPage = () => {
                             </p>
                         </div>
 
-                        {/* Right: purchase card */}
                         <div className="bg-white text-foreground rounded-xl shadow-2xl p-6 space-y-4">
                             {course.thumbnail?.url && (
                                 <img
@@ -138,7 +164,6 @@ const CourseDetailPage = () => {
                                 }
                             </div>
 
-                            {/* ── Enroll / Go to course button ── */}
                             {!isAuthenticated ? (
                                 <LinkButton to="/register" className="w-full" size="lg">
                                     Enroll Now — It's Free
@@ -169,12 +194,10 @@ const CourseDetailPage = () => {
                 </div>
             </div>
 
-            {/* ── Body ───────────────────────────────────────────────────────── */}
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <div className="lg:grid lg:grid-cols-3 lg:gap-12">
                     <div className="lg:col-span-2 space-y-10">
 
-                        {/* What you'll learn */}
                         {course.objectives?.length > 0 && (
                             <section className="space-y-4">
                                 <h2 className="text-xl font-bold">What you'll learn</h2>
@@ -189,7 +212,6 @@ const CourseDetailPage = () => {
                             </section>
                         )}
 
-                        {/* Requirements */}
                         {course.requirements?.length > 0 && (
                             <section className="space-y-3">
                                 <h2 className="text-xl font-bold">Requirements</h2>
@@ -199,7 +221,6 @@ const CourseDetailPage = () => {
                             </section>
                         )}
 
-                        {/* Curriculum */}
                         {course.sections?.length > 0 && (
                             <section className="space-y-4">
                                 <h2 className="text-xl font-bold">Course Content</h2>
@@ -223,8 +244,15 @@ const CourseDetailPage = () => {
                                                             <span className={lesson.isPreview ? 'text-primary' : ''}>
                                                                 {lesson.title}
                                                             </span>
+                                                            {/* ✅ Preview badge is now a clickable button */}
                                                             {lesson.isPreview && (
-                                                                <Badge variant="outline" className="text-xs ml-auto">Preview</Badge>
+                                                                <button
+                                                                    onClick={() => setPreviewLesson(lesson)}
+                                                                    className="ml-auto flex items-center gap-1 text-xs text-primary hover:underline shrink-0"
+                                                                >
+                                                                    <Play className="w-3 h-3" />
+                                                                    Preview
+                                                                </button>
                                                             )}
                                                         </li>
                                                     ))}
@@ -236,7 +264,6 @@ const CourseDetailPage = () => {
                             </section>
                         )}
 
-                        {/* Reviews */}
                         <section className="space-y-4">
                             <h2 className="text-xl font-bold">
                                 Student Reviews

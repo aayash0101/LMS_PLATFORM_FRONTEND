@@ -4,11 +4,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button'
 
 const CATEGORIES = [
-  'Development', 'Business', 'Design', 'Marketing',
-  'IT & Software', 'Personal Development', 'Photography', 'Music',
+  'Web Development',
+  'Mobile Development',
+  'Data Science',
+  'Machine Learning',
+  'DevOps',
+  'Design',
+  'Business',
+  'Marketing',
+  'Photography',
+  'Music',
+  'Other',
 ]
 
-const LEVELS = ['beginner', 'intermediate', 'advanced']
+const LEVELS = ['Beginner', 'Intermediate', 'Advanced']
 
 const CourseFilters = ({ filters, onChange, onReset }) => {
   const handle = (key, value) => onChange({ ...filters, [key]: value, page: 1 })
