@@ -1,4 +1,3 @@
-// src/pages/student/LearnPage.jsx
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import {
@@ -7,7 +6,6 @@ import {
 } from 'lucide-react'
 import { useEnrollment } from '@/features/enrollments/hooks/useEnrollment'
 import { useMarkComplete } from '@/features/enrollments/hooks/useMarkComplete'
-import { useCourseById } from '@/features/courses/hooks/useCourseById'
 import { useEnroll } from '@/features/enrollments/hooks/useEnroll'
 import { useAuth } from '@/hooks/useAuth'
 import { useCourseReviews } from '@/features/reviews/hooks/useCourseReviews'
@@ -74,11 +72,9 @@ const LearnPage = () => {
   const [activeLesson, setActiveLesson] = useState(null)
 
   const { data: enrollmentData, isLoading: enrollmentLoading } = useEnrollment(courseId)
-  const enrollment = enrollmentData?.data
+  const enrollment = enrollmentData?.data?.enrollment
 
-  // Use useCourseById — learn page has _id in URL, not slug
-  const { data: courseData, isLoading: courseLoading } = useCourseById(courseId)
-  const course = courseData?.data
+  const course = enrollment?.course
 
   const { mutate: markComplete, isPending: marking } = useMarkComplete(courseId)
   const { mutate: enroll, isPending: enrolling } = useEnroll(courseId)
@@ -87,8 +83,8 @@ const LearnPage = () => {
   const reviews = Array.isArray(reviewsData?.data)
     ? reviewsData.data
     : Array.isArray(reviewsData?.data?.reviews)
-    ? reviewsData.data.reviews
-    : []
+      ? reviewsData.data.reviews
+      : []
 
   const hasReviewed = reviews.some(
     (r) => r.student?._id === user?._id || r.student === user?._id
@@ -105,9 +101,9 @@ const LearnPage = () => {
   }, [course, enrollment])
 
   const currentIndex = allLessons.findIndex((l) => l._id === activeLesson?._id)
-  const prevLesson   = currentIndex > 0 ? allLessons[currentIndex - 1] : null
-  const nextLesson   = currentIndex < allLessons.length - 1 ? allLessons[currentIndex + 1] : null
-  const isCompleted  = completedIds.has(activeLesson?._id)
+  const prevLesson = currentIndex > 0 ? allLessons[currentIndex - 1] : null
+  const nextLesson = currentIndex < allLessons.length - 1 ? allLessons[currentIndex + 1] : null
+  const isCompleted = completedIds.has(activeLesson?._id)
 
   const handleMarkComplete = () => {
     if (!activeLesson || isCompleted || marking) return
@@ -117,7 +113,7 @@ const LearnPage = () => {
   }
 
   // ── Loading ──────────────────────────────────────────────────────────────
-  if (enrollmentLoading || courseLoading) return (
+  if (enrollmentLoading) return (
     <div className="min-h-screen flex flex-col">
       <Skeleton className="h-14 w-full" />
       <div className="flex flex-1">
@@ -142,7 +138,6 @@ const LearnPage = () => {
         <Button onClick={() => enroll()} disabled={enrolling} className="w-full">
           {enrolling ? 'Enrolling...' : 'Enroll Now'}
         </Button>
-        {/* LinkButton with to prop — no nested Link */}
         <LinkButton variant="ghost" className="w-full" to="/courses">
           Back to courses
         </LinkButton>
@@ -155,7 +150,6 @@ const LearnPage = () => {
 
       {/* ── Top bar ──────────────────────────────────────────────────────── */}
       <header className="h-14 border-b flex items-center gap-4 px-4 sticky top-0 z-50 bg-background">
-        {/* LinkButton with to prop — no nested Link */}
         <LinkButton variant="ghost" size="icon" to="/my-courses">
           <ArrowLeft className="w-4 h-4" />
         </LinkButton>
@@ -229,7 +223,7 @@ const LearnPage = () => {
               </Button>
             </div>
 
-            {/* Review section — outside the nav row, below it */}
+            {/* Review section */}
             {enrollment && !hasReviewed && completedIds.size > 0 && (
               <div className="pt-6 border-t">
                 <ReviewForm courseId={courseId} />

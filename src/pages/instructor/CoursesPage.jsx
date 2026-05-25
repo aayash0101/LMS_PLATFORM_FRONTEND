@@ -1,8 +1,8 @@
+// src/pages/instructor/CoursesPage.jsx
 import { Link } from 'react-router-dom'
-import { PlusCircle, Pencil, Trash2, Eye, EyeOff, BookOpen } from 'lucide-react'
+import { PlusCircle, Pencil, Trash2, BookOpen } from 'lucide-react'
 import { useInstructorCourses } from '@/features/courses/hooks/useInstructorCourses'
 import { useDeleteCourse } from '@/features/courses/hooks/useDeleteCourse'
-import { usePublishCourse } from '@/features/courses/hooks/useUpdateCourse'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -51,7 +51,7 @@ const CoursesPage = () => {
                                 {/* Thumbnail */}
                                 <div className="w-20 h-14 rounded bg-muted overflow-hidden shrink-0">
                                     {course.thumbnail?.url
-                                        ? <img src={course.thumbnail.url} className="w-full h-full object-cover" />
+                                        ? <img src={course.thumbnail.url} className="w-full h-full object-cover" alt={course.title} />
                                         : <div className="w-full h-full flex items-center justify-center">
                                             <BookOpen className="w-5 h-5 text-muted-foreground" />
                                         </div>
@@ -75,10 +75,13 @@ const CoursesPage = () => {
                                         <Pencil className="w-3.5 h-3.5 mr-1.5" />
                                         Edit
                                     </LinkButton>
-                                    <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteCourse(course._id)}>
-                                        <Trash2 className="w-3.5 h-3.5" />
-                                    </Button>
-                                    <Button size="sm" variant="ghost" className="text-destructive" onClick={() => deleteCourse(course._id)}>
+                                    <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        className="text-destructive"
+                                        disabled={deleting}
+                                        onClick={() => deleteCourse(course._id)}
+                                    >
                                         <Trash2 className="w-3.5 h-3.5" />
                                     </Button>
                                 </div>

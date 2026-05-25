@@ -1,3 +1,4 @@
+// src/pages/instructor/EditCoursePage.jsx
 import { useState, useRef, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
@@ -5,7 +6,7 @@ import {
     ArrowLeft, PlusCircle, Trash2, Pencil, Video,
     ChevronDown, ChevronUp, Eye, EyeOff, Upload, Check
 } from 'lucide-react'
-import { useCourse } from '@/features/courses/hooks/useCourse'
+import { useCourseById } from '@/features/courses/hooks/useCourseById'
 import { useUpdateCourse, usePublishCourse } from '@/features/courses/hooks/useUpdateCourse'
 import { useDeleteCourse } from '@/features/courses/hooks/useDeleteCourse'
 import { useCreateSection, useUpdateSection, useDeleteSection } from '@/features/courses/hooks/useSections'
@@ -304,16 +305,16 @@ const EditCoursePage = () => {
     const [thumbUploading, setThumbUploading] = useState(false)
     const thumbRef = useRef()
 
-    const { data: courseData, isLoading } = useCourse(id)
-    const course = courseData?.data
+    // ✅ useCourseById — fetches by _id, not slug
+    const { data: courseData, isLoading } = useCourseById(id)
+    const course = courseData?.data?.course ?? courseData?.data
 
     const { mutate: updateCourse, isPending: updating, error: updateError } = useUpdateCourse(id)
     const { mutate: publishCourse, isPending: publishing } = usePublishCourse(id)
     const { mutate: deleteCourse, isPending: deleting } = useDeleteCourse()
 
-    const { register, handleSubmit, setValue, formState: { errors } } = useForm()
+    const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm()
 
-    // ✅ useEffect, not useState
     useEffect(() => {
         if (course) {
             setValue('title', course.title)
@@ -323,6 +324,9 @@ const EditCoursePage = () => {
             setValue('price', course.price)
         }
     }, [course, setValue])
+
+    const category = watch('category')
+    const level = watch('level')
 
     const onSubmit = (data) => updateCourse({ ...data, price: Number(data.price) })
 
@@ -420,9 +424,10 @@ const EditCoursePage = () => {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-1.5">
                                         <Label>Category</Label>
+                                        {/* ✅ use watched value, not course.category */}
                                         <Select
-                                            value={course.category}
-                                            onValueChange={(v) => setValue('category', v)}
+                                            value={category}
+                                            onValueChange={(v) => setValue('category', v, { shouldValidate: true })}
                                         >
                                             <SelectTrigger><SelectValue /></SelectTrigger>
                                             <SelectContent>
@@ -434,9 +439,10 @@ const EditCoursePage = () => {
                                     </div>
                                     <div className="space-y-1.5">
                                         <Label>Level</Label>
+                                        {/* ✅ use watched value, not course.level */}
                                         <Select
-                                            value={course.level}
-                                            onValueChange={(v) => setValue('level', v)}
+                                            value={level}
+                                            onValueChange={(v) => setValue('level', v, { shouldValidate: true })}
                                         >
                                             <SelectTrigger><SelectValue /></SelectTrigger>
                                             <SelectContent>
