@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import {
-    Star, Users, BookOpen, CheckCircle2, Play, X,
+    Star, Users, BookOpen, CheckCircle2, Play,
 } from 'lucide-react'
 import { useCourse } from '@/features/courses/hooks/useCourse'
 import { useCourseReviews } from '@/features/reviews/hooks/useCourseReviews'
 import { useAuth } from '@/hooks/useAuth'
 import { useEnroll } from '@/features/enrollments/hooks/useEnroll'
 import { useEnrollment } from '@/features/enrollments/hooks/useEnrollment'
+import { useInitiatePayment } from '@/features/payments/hooks/useInitiatePayment'
+import EsewaCheckout from '@/features/payments/components/EsewaCheckout'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -20,7 +22,6 @@ import {
     Dialog, DialogContent, DialogHeader, DialogTitle,
 } from '@/components/ui/dialog'
 
-// ── Skeleton ───────────────────────────────────────────────────────────────
 const DetailSkeleton = () => (
     <div className="max-w-6xl mx-auto px-4 py-10 space-y-6">
         <Skeleton className="h-8 w-2/3" />
@@ -74,6 +75,7 @@ const CourseDetailPage = () => {
     const { slug } = useParams()
     const { isAuthenticated } = useAuth()
     const [previewLesson, setPreviewLesson] = useState(null)
+    const [paymentData, setPaymentData] = useState(null)
 
     const { data: courseData, isLoading } = useCourse(slug)
     const course = courseData?.data?.course
@@ -84,6 +86,7 @@ const CourseDetailPage = () => {
     const enrollment = enrollmentData?.data?.enrollment
 
     const { mutate: enroll, isPending: enrolling } = useEnroll(course?._id)
+    const { mutate: initiatePayment, isPending: initiatingPayment } = useInitiatePayment()
 
     const { data: reviewsData } = useCourseReviews(course?._id)
     const reviews = Array.isArray(reviewsData?.data)
@@ -101,19 +104,30 @@ const CourseDetailPage = () => {
         (acc, s) => acc + (s.lessons?.length ?? 0), 0
     ) ?? 0
 
+    const handleEnroll = () => {
+        if (course.isFree) {
+            enroll()
+        } else {
+            initiatePayment(course._id, {
+                onSuccess: (res) => setPaymentData(res.data),
+            })
+        }
+    }
+
     return (
         <div className="min-h-screen">
-
             <PreviewModal
                 lesson={previewLesson}
                 open={!!previewLesson}
                 onClose={() => setPreviewLesson(null)}
             />
 
+            {/* Invisible eSewa form — auto-submits when paymentData is set */}
+            <EsewaCheckout paymentData={paymentData} />
+
             <div className="bg-slate-900 text-white">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                     <div className="grid lg:grid-cols-3 gap-8 items-start">
-
                         <div className="lg:col-span-2 space-y-4">
                             <div className="flex gap-2 flex-wrap">
                                 <Badge variant="secondary">{course.category}</Badge>
@@ -121,10 +135,8 @@ const CourseDetailPage = () => {
                                     {course.level}
                                 </Badge>
                             </div>
-
                             <h1 className="text-3xl font-bold leading-tight">{course.title}</h1>
                             <p className="text-slate-300 text-lg line-clamp-3">{course.description}</p>
-
                             <div className="flex flex-wrap items-center gap-4 text-sm text-slate-300">
                                 <span className="flex items-center gap-1">
                                     <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
@@ -140,12 +152,9 @@ const CourseDetailPage = () => {
                                     {totalLessons} lessons
                                 </span>
                             </div>
-
                             <p className="text-slate-300 text-sm">
                                 Created by{' '}
-                                <span className="text-white font-medium">
-                                    {course.instructor?.name}
-                                </span>
+                                <span className="text-white font-medium">{course.instructor?.name}</span>
                             </p>
                         </div>
 
@@ -166,7 +175,7 @@ const CourseDetailPage = () => {
 
                             {!isAuthenticated ? (
                                 <LinkButton to="/register" className="w-full" size="lg">
-                                    Enroll Now — It's Free
+                                    Sign up to Enroll
                                 </LinkButton>
                             ) : enrollment ? (
                                 <LinkButton to={`/learn/${course._id}`} className="w-full" size="lg">
@@ -176,14 +185,27 @@ const CourseDetailPage = () => {
                                 <Button
                                     className="w-full"
                                     size="lg"
-                                    onClick={() => enroll()}
-                                    disabled={enrolling}
+                                    onClick={handleEnroll}
+                                    disabled={enrolling || initiatingPayment}
                                 >
-                                    {enrolling
-                                        ? 'Enrolling...'
-                                        : `Enroll${course.isFree ? ' for Free' : ` — $${course.price?.toFixed(2)}`}`
+                                    {enrolling || initiatingPayment
+                                        ? 'Processing...'
+                                        : course.isFree
+                                            ? 'Enroll for Free'
+                                            : `Pay with eSewa — $${course.price?.toFixed(2)}`
                                     }
                                 </Button>
+                            )}
+
+                            {!course.isFree && !enrollment && (
+                                <div className="flex items-center justify-center gap-2">
+                                    <img
+                                        src="https://esewa.com.np/common/images/esewa_logo.png"
+                                        alt="eSewa"
+                                        className="h-5 object-contain"
+                                    />
+                                    <span className="text-xs text-muted-foreground">Secured by eSewa</span>
+                                </div>
                             )}
 
                             <p className="text-xs text-center text-muted-foreground">
@@ -244,7 +266,6 @@ const CourseDetailPage = () => {
                                                             <span className={lesson.isPreview ? 'text-primary' : ''}>
                                                                 {lesson.title}
                                                             </span>
-                                                            {/* ✅ Preview badge is now a clickable button */}
                                                             {lesson.isPreview && (
                                                                 <button
                                                                     onClick={() => setPreviewLesson(lesson)}
