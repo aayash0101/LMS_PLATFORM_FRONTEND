@@ -7,7 +7,6 @@ export const useVerifyPayment = () => {
     mutationFn: ({ encodedData, courseId }) =>
       verifyPaymentApi(encodedData, courseId).then((r) => r.data),
     onSuccess: (_, { courseId }) => {
-      // Invalidate enrollment so the UI updates immediately
       queryClient.invalidateQueries({ queryKey: ['enrollment', courseId] })
       queryClient.invalidateQueries({ queryKey: ['enrollments'] })
     },
