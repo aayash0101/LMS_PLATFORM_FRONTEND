@@ -1,3 +1,4 @@
+// src/features/payments/components/EsewaCheckout.jsx
 import { useEffect, useRef } from 'react'
 
 const EsewaCheckout = ({ paymentData }) => {
@@ -21,6 +22,10 @@ const EsewaCheckout = ({ paymentData }) => {
     failureUrl,
   } = paymentData
 
+  // eSewa V2 requires total_amount = amount + tax + service + delivery
+  // Since all extras are 0, total_amount === amount
+  const totalAmount = amount
+
   return (
     <form
       ref={formRef}
@@ -28,9 +33,9 @@ const EsewaCheckout = ({ paymentData }) => {
       action={paymentUrl}
       className="hidden"
     >
-      <input type="hidden" name="amount" value={amount} />
+      <input type="hidden" name="amount" value={totalAmount} />
       <input type="hidden" name="tax_amount" value="0" />
-      <input type="hidden" name="total_amount" value={amount} />
+      <input type="hidden" name="total_amount" value={totalAmount} />
       <input type="hidden" name="transaction_uuid" value={transactionId} />
       <input type="hidden" name="product_code" value={merchantCode} />
       <input type="hidden" name="product_service_charge" value="0" />

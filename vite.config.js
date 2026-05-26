@@ -15,5 +15,7 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    allowedHosts: 'all',
+    allowedHosts: ['turmoil-failing-family.ngrok-free.dev'],
   },
 })

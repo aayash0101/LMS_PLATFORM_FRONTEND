@@ -21,6 +21,7 @@ import InstructorCoursesPage from '@/pages/instructor/CoursesPage'
 import CreateCoursePage from '@/pages/instructor/CreateCoursePage'
 import EditCoursePage from '@/pages/instructor/EditCoursePage'
 import AnalyticsPage from '@/pages/instructor/AnalyticsPage'
+import PaymentVerifyPage from '@/pages/student/PaymentVerifyPage'
 
 import NotFoundPage from '@/pages/NotFoundPage'
 import UnauthorizedPage from '@/pages/UnauthorizedPage'
@@ -52,6 +53,7 @@ const router = createBrowserRouter([
             ],
           },
           { path: '/learn/:courseId', element: <LearnPage /> },
+          { path: '/payment/verify',    element: <PaymentVerifyPage /> },
         ],
       },
     ],
