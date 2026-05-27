@@ -1,7 +1,7 @@
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import { useLogin } from '../hooks/useLogin'
-
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -9,7 +9,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription } from '@/components/ui/alert'
 
 const LoginForm = () => {
-  const { mutate: login, isPending, error } = useLogin()
+  const { mutate: login, isPending } = useLogin()
+  const [apiError, setApiError] = useState(null)
 
   const {
     register,
@@ -17,9 +18,14 @@ const LoginForm = () => {
     formState: { errors },
   } = useForm({ defaultValues: { email: '', password: '' } })
 
-  const onSubmit = (data) => login(data)
-
-  const apiError = error?.response?.data?.message
+  const onSubmit = (data) => {
+    setApiError(null)
+    login(data, {
+      onError: (err) => {
+        setApiError(err?.response?.data?.message ?? 'Invalid credentials. Please try again.')
+      },
+    })
+  }
 
   return (
     <Card className="w-full max-w-md mx-auto">
@@ -27,16 +33,13 @@ const LoginForm = () => {
         <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
         <CardDescription>Sign in to continue learning</CardDescription>
       </CardHeader>
-
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-
           {apiError && (
             <Alert variant="destructive">
               <AlertDescription>{apiError}</AlertDescription>
             </Alert>
           )}
-
           {/* Email */}
           <div className="space-y-1">
             <Label htmlFor="email">Email</Label>
@@ -53,7 +56,6 @@ const LoginForm = () => {
               <p className="text-sm text-destructive">{errors.email.message}</p>
             )}
           </div>
-
           {/* Password */}
           <div className="space-y-1">
             <div className="flex items-center justify-between">
@@ -69,13 +71,11 @@ const LoginForm = () => {
               <p className="text-sm text-destructive">{errors.password.message}</p>
             )}
           </div>
-
           <Button type="submit" className="w-full" disabled={isPending}>
             {isPending ? 'Signing in...' : 'Sign in'}
           </Button>
         </form>
       </CardContent>
-
       <CardFooter className="justify-center">
         <p className="text-sm text-muted-foreground">
           Don't have an account?{' '}
