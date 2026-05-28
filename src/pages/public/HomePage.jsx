@@ -13,11 +13,10 @@ const STATS = [
 
 const HomePage = () => {
     const { data, isLoading } = useCourses({ limit: 8, sort: 'popular' })
-    const courses = data?.data ?? []
-
+    const courses = data?.data?.courses ?? []
+    
     return (
         <div>
-            {/* Hero */}
             <section className="bg-gradient-to-br from-primary/10 via-background to-background py-20 px-4">
                 <div className="max-w-4xl mx-auto text-center space-y-6">
                     <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">

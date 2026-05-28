@@ -15,11 +15,11 @@ export const useUpdateCourse = (id) => {
 
 export const usePublishCourse = (id) => {
   const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: () => publishCourseApi(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['instructor-courses'] })
+      queryClient.invalidateQueries({ queryKey: ['course', id] }) 
     },
   })
 }
